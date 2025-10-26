@@ -30,7 +30,7 @@ jobs:
         working-directory: frontend
 
       - name: Deploy via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -38,7 +38,7 @@ jobs:
           protocol: ftps
           security: strict
           local-dir: backend/
-          server-dir: /home/tomvande/domains/chores.tovan.be/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
           exclude: |
             **/.git*
             **/.github/**
