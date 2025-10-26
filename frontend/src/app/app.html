@@ -1,23 +1,56 @@
-<div class="app-container">
-  <!-- Simple top bar for mobile -->
-  <mat-toolbar color="primary" class="top-bar">
-    <span class="app-title">ChoreQuest</span>
-  </mat-toolbar>
+<ng-container *ngIf="isHandset$ | async as handset">
+  <div class="app-container" [class.desktop]="!handset.matches">
+    <mat-toolbar color="primary" class="top-bar" *ngIf="handset.matches">
+      <span class="app-title">ChoreQuest</span>
+    </mat-toolbar>
 
-  <!-- Main content area -->
-  <main class="main-content">
-    <router-outlet></router-outlet>
-  </main>
+    <div class="app-shell">
+      <aside class="side-nav" *ngIf="!handset.matches">
+        <div class="brand">
+          <mat-icon>check_circle</mat-icon>
+          <span>ChoreQuest</span>
+        </div>
 
-  <!-- Bottom navigation for mobile -->
-  <nav class="bottom-nav" *ngIf="(isHandset$ | async)?.matches">
-    <button mat-button class="nav-button" routerLink="/dashboard" routerLinkActive="active">
-      <mat-icon>home</mat-icon>
-      <span>Home</span>
-    </button>
-    <button mat-button class="nav-button" routerLink="/notifications" routerLinkActive="active">
-      <mat-icon>notifications</mat-icon>
-      <span>Alerts</span>
-    </button>
-  </nav>
-</div>
+        <nav class="nav-links">
+          <a mat-button class="side-link" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <mat-icon>dashboard</mat-icon>
+            <span>Dashboard</span>
+          </a>
+          <a mat-button class="side-link" routerLink="/notifications" routerLinkActive="active">
+            <mat-icon>notifications</mat-icon>
+            <span>Notifications</span>
+          </a>
+        </nav>
+
+        <div class="side-footer">
+          <p class="foot-title">Plan smarter</p>
+          <p class="foot-text">Review lists, share chores, and keep everyone in sync.</p>
+        </div>
+      </aside>
+
+      <div class="content-pane">
+        <mat-toolbar color="primary" class="desktop-toolbar" *ngIf="!handset.matches">
+          <span class="app-title">ChoreQuest</span>
+          <span class="spacer"></span>
+          <a mat-button routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+          <a mat-button routerLink="/notifications" routerLinkActive="active-link">Notifications</a>
+        </mat-toolbar>
+
+        <main class="main-content">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+    </div>
+
+    <nav class="bottom-nav" *ngIf="handset.matches">
+      <button mat-button class="nav-button" routerLink="/dashboard" routerLinkActive="active">
+        <mat-icon>home</mat-icon>
+        <span>Home</span>
+      </button>
+      <button mat-button class="nav-button" routerLink="/notifications" routerLinkActive="active">
+        <mat-icon>notifications</mat-icon>
+        <span>Alerts</span>
+      </button>
+    </nav>
+  </div>
+</ng-container>
