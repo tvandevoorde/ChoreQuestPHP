@@ -36,7 +36,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
-          security: strict
+          security: loose
           local-dir: backend/
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
           exclude: |
