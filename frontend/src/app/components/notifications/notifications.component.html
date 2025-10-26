@@ -1,0 +1,36 @@
+<div class="notifications-page">
+  <header>
+    <div>
+      <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
+      <h1>Notifications</h1>
+    </div>
+    <button class="btn btn-primary" (click)="markAllAsRead()">
+      Mark All as Read
+    </button>
+  </header>
+
+  <div class="content">
+    <div *ngIf="notifications.length === 0" class="empty-state">
+      <p>No notifications</p>
+    </div>
+
+    <div class="notifications-list">
+      <div *ngFor="let notification of notifications" 
+           class="notification-item"
+           [class.unread]="!notification.isRead"
+           (click)="markAsRead(notification)">
+        <div class="notification-icon">
+          {{ getNotificationIcon(notification.type) }}
+        </div>
+        <div class="notification-content">
+          <h3>{{ notification.title }}</h3>
+          <p>{{ notification.message }}</p>
+          <span class="notification-time">{{ notification.createdAt | date:'medium' }}</span>
+        </div>
+        <button class="btn-icon" (click)="deleteNotification(notification.id); $event.stopPropagation()" title="Delete">
+          🗑️
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

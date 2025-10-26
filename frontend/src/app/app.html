@@ -1,0 +1,23 @@
+<div class="app-container">
+  <!-- Simple top bar for mobile -->
+  <mat-toolbar color="primary" class="top-bar">
+    <span class="app-title">ChoreQuest</span>
+  </mat-toolbar>
+
+  <!-- Main content area -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Bottom navigation for mobile -->
+  <nav class="bottom-nav" *ngIf="(isHandset$ | async)?.matches">
+    <button mat-button class="nav-button" routerLink="/dashboard" routerLinkActive="active">
+      <mat-icon>home</mat-icon>
+      <span>Home</span>
+    </button>
+    <button mat-button class="nav-button" routerLink="/notifications" routerLinkActive="active">
+      <mat-icon>notifications</mat-icon>
+      <span>Alerts</span>
+    </button>
+  </nav>
+</div>

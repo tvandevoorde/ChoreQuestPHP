@@ -1,0 +1,247 @@
+<div class="chore-list-mobile" *ngIf="choreList">
+  <!-- Mobile Header -->
+  <mat-toolbar class="mobile-header">
+    <button mat-icon-button routerLink="/dashboard" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <h1>{{ choreList.name }}</h1>
+      <p *ngIf="choreList.description">{{ choreList.description }}</p>
+    </div>
+  </mat-toolbar>
+
+  <!-- Progress Card -->
+  <mat-card class="progress-card">
+    <mat-card-content>
+      <div class="progress-header">
+        <div class="progress-stats">
+          <span class="completed">{{ choreList.completedChoreCount }}</span>
+          <span class="separator">/</span>
+          <span class="total">{{ choreList.choreCount }}</span>
+        </div>
+        <span class="progress-label">Completed</span>
+      </div>
+      <mat-progress-bar 
+        mode="determinate" 
+        [value]="getProgressPercentage()" 
+        class="progress-bar">
+      </mat-progress-bar>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <button mat-raised-button color="primary" class="action-button" (click)="showCreateChore = !showCreateChore">
+      <mat-icon>add</mat-icon>
+      Add Chore
+    </button>
+    <button mat-stroked-button class="action-button" (click)="showShareForm = !showShareForm">
+      <mat-icon>share</mat-icon>
+      Share List
+    </button>
+  </div>
+
+  <!-- Shared With Info -->
+  <mat-card *ngIf="choreList.shares.length > 0" class="shares-card">
+    <mat-card-content>
+      <div class="shares-header">
+        <mat-icon>people</mat-icon>
+        <span>Shared with {{ choreList.shares.length }} {{ choreList.shares.length === 1 ? 'person' : 'people' }}</span>
+      </div>
+      <div class="shares-list">
+        <mat-chip-set>
+          <mat-chip *ngFor="let share of choreList.shares" class="share-chip">
+            {{ share.sharedWithUsername }}
+            <button matChipRemove (click)="removeShare(share.id)">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Share Form -->
+  <mat-card *ngIf="showShareForm" class="form-card">
+    <mat-card-header>
+      <mat-card-title>Share Chore List</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="shareList()" class="share-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select User</mat-label>
+          <mat-select [(ngModel)]="shareDto.sharedWithUserId" name="user" required>
+            <mat-option [value]="0">Select a user...</mat-option>
+            <mat-option *ngFor="let user of users" [value]="user.id">
+              {{ user.username }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Permission</mat-label>
+          <mat-select [(ngModel)]="shareDto.permission" name="permission">
+            <mat-option value="View">View</mat-option>
+            <mat-option value="Edit">Edit</mat-option>
+            <mat-option value="Admin">Admin</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button type="submit" mat-raised-button color="primary">Share</button>
+          <button type="button" mat-stroked-button (click)="showShareForm = false">Cancel</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Create Chore Form -->
+  <mat-card *ngIf="showCreateChore" class="form-card">
+    <mat-card-header>
+      <mat-card-title>Create New Chore</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="createChore()" class="create-chore-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput [(ngModel)]="newChore.title" name="title" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput [(ngModel)]="newChore.description" name="description" rows="3"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Assign To</mat-label>
+          <mat-select [(ngModel)]="newChore.assignedToId" name="assignedTo">
+            <mat-option [value]="undefined">Unassigned</mat-option>
+            <mat-option [value]="currentUser.id">Me</mat-option>
+            <mat-option *ngFor="let user of users" [value]="user.id">
+              {{ user.username }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Due Date</mat-label>
+          <input matInput type="date" [(ngModel)]="newChore.dueDate" name="dueDate">
+        </mat-form-field>
+
+        <div class="checkbox-field">
+          <mat-checkbox [(ngModel)]="newChore.isRecurring" name="isRecurring">
+            Recurring Chore
+          </mat-checkbox>
+        </div>
+
+        <!-- Recurring Options -->
+        <mat-expansion-panel *ngIf="newChore.isRecurring" class="recurring-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Recurrence Settings</mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Recurrence Pattern</mat-label>
+            <mat-select [(ngModel)]="newChore.recurrencePattern" name="pattern">
+              <mat-option value="Daily">Daily</mat-option>
+              <mat-option value="Weekly">Weekly</mat-option>
+              <mat-option value="Monthly">Monthly</mat-option>
+              <mat-option value="Yearly">Yearly</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Every (interval)</mat-label>
+            <input matInput type="number" [(ngModel)]="newChore.recurrenceInterval" name="interval" min="1">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>End Date (optional)</mat-label>
+            <input matInput type="date" [(ngModel)]="newChore.recurrenceEndDate" name="endDate">
+          </mat-form-field>
+        </mat-expansion-panel>
+
+        <div class="form-actions">
+          <button type="submit" mat-raised-button color="primary">Create</button>
+          <button type="button" mat-stroked-button (click)="showCreateChore = false">Cancel</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Chores Section -->
+  <div class="chores-section">
+    <div class="section-header">
+      <h2>Chores</h2>
+      <div class="filter-chips" *ngIf="chores.length > 0">
+        <mat-chip-set>
+          <mat-chip>All ({{ chores.length }})</mat-chip>
+          <mat-chip>Pending ({{ getPendingCount() }})</mat-chip>
+          <mat-chip>Completed ({{ choreList.completedChoreCount }})</mat-chip>
+        </mat-chip-set>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="chores.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">assignment</mat-icon>
+      <h3>No chores yet</h3>
+      <p>Add your first chore to get started with your list!</p>
+      <button mat-raised-button color="primary" (click)="showCreateChore = true" class="cta-button">
+        <mat-icon>add</mat-icon>
+        Create First Chore
+      </button>
+    </div>
+
+    <!-- Chores List -->
+    <div class="chores-list" *ngIf="chores.length > 0">
+      <mat-card 
+        *ngFor="let chore of chores" 
+        class="chore-card"
+        [class.completed]="chore.isCompleted"
+        [class.overdue]="isOverdue(chore)"
+        [class.due-soon]="isDueSoon(chore)">
+        
+        <mat-card-content class="chore-content">
+          <div class="chore-main">
+            <mat-checkbox 
+              [checked]="chore.isCompleted" 
+              (change)="toggleChoreComplete(chore)"
+              class="chore-checkbox">
+            </mat-checkbox>
+            
+            <div class="chore-info">
+              <h3 [class.completed-text]="chore.isCompleted">{{ chore.title }}</h3>
+              <p *ngIf="chore.description" class="chore-description">{{ chore.description }}</p>
+              
+              <div class="chore-meta">
+                <mat-chip-set>
+                  <mat-chip *ngIf="chore.assignedToUsername" class="meta-chip assigned">
+                    <mat-icon matChipAvatar>person</mat-icon>
+                    {{ chore.assignedToUsername }}
+                  </mat-chip>
+                  
+                  <mat-chip *ngIf="chore.dueDate" class="meta-chip due-date"
+                           [class.overdue-chip]="isOverdue(chore)"
+                           [class.due-soon-chip]="isDueSoon(chore)">
+                    <mat-icon matChipAvatar>schedule</mat-icon>
+                    {{ chore.dueDate | date:'MMM d' }}
+                  </mat-chip>
+                  
+                  <mat-chip *ngIf="chore.isRecurring" class="meta-chip recurring">
+                    <mat-icon matChipAvatar>repeat</mat-icon>
+                    {{ chore.recurrencePattern }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+            </div>
+
+            <button mat-icon-button class="delete-button" (click)="deleteChore(chore)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

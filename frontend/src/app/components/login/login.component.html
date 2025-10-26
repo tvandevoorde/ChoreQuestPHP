@@ -1,0 +1,60 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <div mat-card-avatar class="login-avatar">
+        <mat-icon>account_circle</mat-icon>
+      </div>
+      <mat-card-title>Welcome Back</mat-card-title>
+      <mat-card-subtitle>Login to ChoreQuest</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form (ngSubmit)="login()" class="login-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input
+            matInput
+            [(ngModel)]="credentials.username"
+            name="username"
+            required
+            autocomplete="username"
+          />
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            type="password"
+            [(ngModel)]="credentials.password"
+            name="password"
+            required
+            autocomplete="current-password"
+          />
+          <mat-icon matSuffix>lock</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" class="full-width login-button">
+          <mat-icon>login</mat-icon>
+          Login
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <div class="register-section">
+        <span>Don't have an account?</span>
+        <button mat-button color="accent" routerLink="/register">
+          Register here
+        </button>
+      </div>
+      <div class="forgot-password-section">
+        <span>Forgot your password?</span>
+        <button mat-button color="accent" routerLink="/forgot-password">
+          Reset it here
+        </button>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</div>
