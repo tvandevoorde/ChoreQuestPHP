@@ -1,13 +1,9 @@
 RewriteEngine On
 
-# Allow direct access to API endpoints
-RewriteCond %{REQUEST_URI} ^/api
-RewriteRule ^ - [L]
-
 # Serve existing files or directories as-is
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Fallback all other requests to index.php so PHP can serve the SPA bundle
-RewriteRule ^ index.php [L]
+# Route everything else (including /api) through index.php so PHP can handle API and SPA routing
+RewriteRule ^ index.php [L,QSA]
