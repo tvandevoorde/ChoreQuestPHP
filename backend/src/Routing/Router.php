@@ -20,7 +20,13 @@ class Router
             $normalised = '/';
         }
 
-        $regex = preg_replace('#\{([a-zA-Z0-9_]+)\}#', '(?P<$1>[^/]+)', $normalised);
+        $regex = preg_replace_callback('#\{([a-zA-Z0-9_]+)\}#', function (array $matches): string {
+            $param = $matches[1];
+            $lower = strtolower($param);
+            $pattern = str_ends_with($lower, 'id') ? '[0-9]+' : '[^/]+';
+
+            return '(?P<' . $param . '>' . $pattern . ')';
+        }, $normalised);
         $this->routes[] = [
             'method' => strtoupper($method),
             'regex' => '#^' . $regex . '$#',
